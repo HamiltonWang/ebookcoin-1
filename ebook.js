@@ -62,6 +62,8 @@ let start = function(cb) {
     });
   }
 
+
+
   doStart(function(err, server) {
     return cb(err, server);
   });
