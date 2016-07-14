@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const ExpressApp = require('./lib/expressapp'),
+  WsApp = require('./lib/wsapp'),
   config = require('./config'),
   cluster = require('cluster'),
   sticky = require('sticky-session'),
@@ -32,10 +33,12 @@ if (config.ssl.enabled) {
 
 let start = function(cb) {
   let expressApp = new ExpressApp();
+  let wsapp = new WsApp();
+  let server = config.ssl.enabled ? serverModule.createServer(
+    serverOpts,
+    expressApp.app) : serverModule.Server(expressApp.app);
 
   function doStart(cb) {
-
-
     async.auto({
       //数据库连接
       connect_db: function(callback) {
@@ -48,20 +51,21 @@ let start = function(cb) {
       },
       //api server init
       start_express: function(callback) {
-        let server = config.ssl.enabled ? serverModule.createServer(
-          serverOpts,
-          expressApp.app) : serverModule.Server(expressApp.app);
         expressApp.start(config);
         callback(null, server);
+      },
+      start_socket: function(callback) {
+        wsapp.start(server, config, callback);
       }
     }, function(err, results) {
       cb(err, results['start_express']);
     });
-
   }
+
   doStart(function(err, server) {
     return cb(err, server);
   });
+
 }
 
 start(function(err, server) {

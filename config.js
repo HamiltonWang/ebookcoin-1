@@ -162,24 +162,30 @@ module.exports = {
     "path": "mongodb://localhost:27017/ebook",
     "sslCA_PATH": "", //sslCA 文件路径
     "dbOptions": {
-      db: {
-        native_parser: true
+      "db": {
+        "native_parser": true
       },
-      server: {
-        poolSize: 100,
-        auto_reconnect: true,
-        socketOptions: {
-          connectTimeoutMS: 30000,
-          keepAlive: 1
+      "server": {
+        "poolSize": 100,
+        "auto_reconnect": true,
+        "socketOptions": {
+          "connectTimeoutMS": 30000,
+          "keepAlive": 1
         }
       },
-      replset: {
-        poolSize: 100,
-        socketOptions: {
-          connectTimeoutMS: 30000,
-          keepAlive: 1
+      "replset": {
+        "poolSize": 100,
+        "socketOptions": {
+          "connectTimeoutMS": 30000,
+          "keepAlive": 1
         }
       }
     }
-  }
+  },
+  "messageBrokerOpts": {
+    //  To use message broker server, uncomment this:
+    "messageBrokerServer": {
+      "url": 'http://localhost:7001',
+    },
+  },
 }
