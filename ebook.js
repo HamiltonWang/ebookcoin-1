@@ -8,7 +8,9 @@ const ExpressApp = require('./lib/expressapp'),
   http = require('http'),
   https = require('https'),
   fs = require('fs'),
-  log = require('npmlog');
+  log = require('npmlog'),
+  async = require('async'),
+  db = require('./lib/storage');
 
 log.debug = log.verbose;
 log.disableColor();
@@ -32,10 +34,30 @@ let start = function(cb) {
   let expressApp = new ExpressApp();
 
   function doStart(cb) {
-    let server = config.ssl.enabled ? serverModule.createServer(serverOpts,
-      expressApp.app) : serverModule.Server(expressApp.app);
-    expressApp.start(config);
-    cb(null, server);
+
+
+    async.auto({
+      //数据库连接
+      connect_db: function(callback) {
+        let mgo = new db(config.db);
+        let connection = mgo.connect();
+        connection.once('open', function() {
+          console.log('db init success');
+        });
+        callback(null);
+      },
+      //api server init
+      start_express: function(callback) {
+        let server = config.ssl.enabled ? serverModule.createServer(
+          serverOpts,
+          expressApp.app) : serverModule.Server(expressApp.app);
+        expressApp.start(config);
+        callback(null, server);
+      }
+    }, function(err, results) {
+      cb(err, results['start_express']);
+    });
+
   }
   doStart(function(err, server) {
     return cb(err, server);

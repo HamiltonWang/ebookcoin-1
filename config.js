@@ -156,5 +156,30 @@ module.exports = {
     "masterrequired": true,
     "masterpassword": "Hg9M6MehFdaR",
     "autoexec": []
+  },
+  "db": {
+    "ssl": false,
+    "path": "mongodb://localhost:27017/ebook",
+    "sslCA_PATH": "", //sslCA 文件路径
+    "dbOptions": {
+      db: {
+        native_parser: true
+      },
+      server: {
+        poolSize: 100,
+        auto_reconnect: true,
+        socketOptions: {
+          connectTimeoutMS: 30000,
+          keepAlive: 1
+        }
+      },
+      replset: {
+        poolSize: 100,
+        socketOptions: {
+          connectTimeoutMS: 30000,
+          keepAlive: 1
+        }
+      }
+    }
   }
 }
